@@ -102,50 +102,88 @@ photo-site/
 
 ### 2. 添加你的照片
 
-#### 准备照片文件
-1. 将你的照片放入 `public/images/` 文件夹
-2. 建议图片尺寸：
-   - 封面图：1200x800px
-   - 作品图：1920x1080px 或更高
-   - 格式：JPG、PNG、WebP
+#### 照片数据结构说明
+项目当前使用 `generatePhotos()` 函数创建示例照片。要使用您的照片，需要在 `src/data/photos.ts` 中进行替换。
 
-#### 配置照片数据
-编辑 `src/data/photos.ts` 文件：
+#### 方式一：完全自定义（推荐）
+创建您自己的照片数组来替换生成的照片：
 
 ```typescript
-export const photoCategories: PhotoCategory[] = [
+// 创建您的照片数组
+const myLandscapePhotos = [
   {
-    id: 'your-category',
-    name: '你的分类名称',
-    description: '分类描述',
-    coverImage: '/images/your-cover.jpg',
-    totalCount: 10, // 该分类下的照片数量
-  },
-  // 添加更多分类...
-];
-
-// 照片数据示例
-const generatePhotos = (categoryId: string, count: number) => {
-  return Array.from({ length: count }, (_, index) => ({
-    id: index + 1,
-    url: `/images/${categoryId}/photo-${index + 1}.jpg`,
-    thumbnailUrl: `/images/${categoryId}/thumb-${index + 1}.jpg`,
-    title: `照片标题 ${index + 1}`,
-    description: '照片描述文字',
-    tags: ['标签1', '标签2', '标签3'],
+    id: 1,
+    url: '/images/landscape/my-sunset.jpg',
+    thumbnailUrl: '/images/landscape/thumbs/my-sunset.jpg',
+    title: '日落美景',
+    description: '在海边拍摄的壮丽日落',
+    tags: ['日落', '海景', '自然'],
     exif: {
-      camera: '相机型号',
-      lens: '镜头信息',
+      camera: 'Canon EOS R5',
+      lens: '24-70mm f/2.8',
       iso: 100,
-      aperture: 'f/2.8',
+      aperture: 'f/8.0',
       shutterSpeed: '1/125s',
       focalLength: '50mm',
     },
     date: '2024-01-01',
-    location: '拍摄地点',
-  }));
-};
+    location: '青岛海滨',
+  },
+  // 添加更多照片...
+];
+
+// 在分类配置中使用您的照片
+export const photoCategories: PhotoCategory[] = [
+  {
+    id: 'landscape',
+    name: '风景摄影',
+    description: '我的风景摄影作品',
+    coverImage: '/images/landscape/my-cover.jpg',
+    photos: myLandscapePhotos, // 使用您的照片数组
+    totalCount: myLandscapePhotos.length
+  },
+  // 其他分类可以继续使用 generatePhotos 或自定义数组
+];
 ```
+
+#### 方式二：混合使用
+保留部分生成照片，只自定义特定分类：
+
+```typescript
+export const photoCategories: PhotoCategory[] = [
+  {
+    id: 'landscape',
+    name: '风景摄影',
+    photos: myCustomLandscapePhotos, // 使用自定义照片
+    totalCount: myCustomLandscapePhotos.length
+  },
+  {
+    id: 'portrait',
+    name: '人像摄影',
+    photos: generatePhotos('portrait', 15), // 继续使用生成照片
+    totalCount: 15
+  }
+];
+```
+
+#### 准备照片文件
+1. 在 `public/images/` 目录下创建分类文件夹
+2. 将照片文件放入对应文件夹
+3. 建议创建缩略图文件夹 `thumbs/` 用于快速加载
+
+```
+public/images/
+├── landscape/
+│   ├── my-sunset.jpg
+│   ├── my-mountain.jpg
+│   └── thumbs/
+│       ├── my-sunset.jpg
+│       └── my-mountain.jpg
+└── portrait/
+    └── ...
+```
+
+📖 **详细的照片添加教程请查看：[如何添加照片.md](./如何添加照片.md)**
 
 ### 3. 自定义配色方案
 
