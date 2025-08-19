@@ -2,7 +2,7 @@
 
 一个简洁、温馨的响应式照片分享网站，使用 React + TypeScript + Tailwind CSS 构建。
 
-![项目截图](https://via.placeholder.com/800x400/e2a85c/ffffff?text=照片分享)
+![项目截图](https://gitee.com/zjjyyyk/figurebed/raw/master/images/20250819183818863.png)
 
 ## ✨ 特性
 
@@ -39,7 +39,8 @@ npm start
 ```
 
 4. **访问网站**
-打开浏览器访问 `http://localhost:3000`
+打开浏览器访问 `http://localhost:3000/photo-site`
+
 
 ## 📁 项目结构
 

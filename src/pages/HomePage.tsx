@@ -195,10 +195,10 @@ const HomePage: React.FC = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             <h3 className="text-2xl font-serif font-semibold text-warm-900 mb-4">
-              "摄影是一瞬间的艺术"
+              "记录生活的美好瞬间"
             </h3>
             <p className="text-warm-700 text-lg">
-              每一张照片都承载着独特的故事和情感，让我们一起在光影中寻找美的足迹
+              每一张照片都记录着生活中的点点滴滴，分享这些珍贵的回忆让生活更加精彩
             </p>
           </motion.div>
         </div>
