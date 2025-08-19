@@ -42,6 +42,8 @@ npm start
 4. **访问网站**
 打开浏览器访问 `http://localhost:3000/photo-site`
 
+> **📝 注意**: 本项目配置了子路径部署，所以本地开发时访问地址为 `http://localhost:3000/photo-site`，而不是 `http://localhost:3000`。这确保了本地开发环境与 GitHub Pages 部署环境 (`https://zjjyyyk.github.io/photo-site/`) 的一致性。
+
 
 ## 📁 项目结构
 
@@ -102,11 +104,13 @@ photo-site/
 
 #### 准备照片文件
 1. 将你的照片放入 `public/images/` 文件夹
-2. 建议图片格式：JPG、PNG、WebP
-3. 建议尺寸：1200x800px 或更高
+2. 建议图片尺寸：
+   - 封面图：1200x800px
+   - 作品图：1920x1080px 或更高
+   - 格式：JPG、PNG、WebP
 
 #### 配置照片数据
-编辑 `src/data/photos.ts` 文件，添加你的照片分类和具体照片信息：
+编辑 `src/data/photos.ts` 文件：
 
 ```typescript
 export const photoCategories: PhotoCategory[] = [
@@ -119,96 +123,27 @@ export const photoCategories: PhotoCategory[] = [
   },
   // 添加更多分类...
 ];
-```
 
-### 3. 自定义配色方案
-
-编辑 `tailwind.config.js` 文件中的颜色配置：
-
-```javascript
-colors: {
-  warm: {
-    50: '#你的颜色代码',
-    // ... 其他色阶
-  },
-  cream: {
-    50: '#你的颜色代码',
-    // ... 其他色阶
-  }
-}
-```
-
-### 4. 调整每页显示数量
-
-在 `src/pages/CategoryPage.tsx` 中修改 `PHOTOS_PER_PAGE` 常量来调整每页显示的照片数量。
-
-## 🛠️ 技术栈
-
-- **前端框架**: React 18 + TypeScript
-- **样式框架**: Tailwind CSS 3.4.x
-- **动画库**: Framer Motion
-- **路由**: React Router DOM
-- **构建工具**: Create React App
-- **部署**: GitHub Pages + GitHub Actions
-
-## 📝 项目特点
-
-- ✅ 完全响应式设计
-- ✅ 支持子路径部署
-- ✅ 自动化 CI/CD 部署
-- ✅ 优雅的动画效果
-- ✅ 图片懒加载
-- ✅ TypeScript 类型安全
-
-## 🚀 在线预览
-
-访问 [https://zjjyyyk.github.io/photo-site/](https://zjjyyyk.github.io/photo-site/) 查看在线演示。
-
----
-
-享受构建你的个人照片分享网站的过程！📸✨
-
-### 2. 添加你的照片
-
-#### 准备照片文件
-1. 将你的照片放入 `public/images/` 文件夹
-2. 建议图片尺寸：
-   - 封面图：1200x800px
-   - 作品图：1920x1080px 或更高
-   - 格式：JPG、PNG、WebP
-
-#### 配置照片数据
-编辑 `src/data/photos.ts`:
-
-```typescript
-export const photoCategories: PhotoCategory[] = [
-  {
-    id: 'your-category-id',
-    name: '你的分类名称',
-    description: '分类描述文字',
-    coverImage: '/images/your-cover-image.jpg',
-    totalCount: 12, // 该分类下的照片总数
-  },
-  // 添加更多分类...
-];
-
-export const photosByCategory: Record<string, Photo[]> = {
-  'your-category-id': [
-    {
-      id: '1',
-      title: '照片标题',
-      description: '照片描述',
-      url: '/images/your-photo.jpg',
-      category: 'your-category-id',
-      tags: ['标签1', '标签2'],
-      location: '拍摄地点',
-      date: '2024-01-01',
+// 照片数据示例
+const generatePhotos = (categoryId: string, count: number) => {
+  return Array.from({ length: count }, (_, index) => ({
+    id: index + 1,
+    url: `/images/${categoryId}/photo-${index + 1}.jpg`,
+    thumbnailUrl: `/images/${categoryId}/thumb-${index + 1}.jpg`,
+    title: `照片标题 ${index + 1}`,
+    description: '照片描述文字',
+    tags: ['标签1', '标签2', '标签3'],
+    exif: {
       camera: '相机型号',
       lens: '镜头信息',
-      settings: 'f/2.8, 1/125s, ISO 100',
+      iso: 100,
+      aperture: 'f/2.8',
+      shutterSpeed: '1/125s',
+      focalLength: '50mm',
     },
-    // 添加更多照片...
-  ],
+    date: '2024-01-01',
+    location: '拍摄地点',
+  }));
 };
 ```
 
@@ -293,7 +228,7 @@ fontFamily: {
 3. 使用图片 CDN 服务 (如 Cloudinary, ImageKit)
 
 #### 懒加载配置
-项目已内置图片懒加载，可在 `src/hooks/useImageLoader.ts` 中调整配置
+项目已内置图片懒加载，可在 `src/hooks/index.ts` 中调整配置
 
 ## 🛠️ 开发指南
 
@@ -355,6 +290,29 @@ import { motion } from 'framer-motion';
 - `lg`: 1024px 及以上 (桌面)
 - `xl`: 1280px 及以上 (大屏幕)
 
+## 🛠️ 技术栈
+
+- **前端框架**: React 18 + TypeScript
+- **样式框架**: Tailwind CSS 3.4.x
+- **动画库**: Framer Motion
+- **路由**: React Router DOM
+- **构建工具**: Create React App
+- **部署**: GitHub Pages + GitHub Actions
+
+## 📝 项目特点
+
+- ✅ 完全响应式设计
+- ✅ 支持子路径部署
+- ✅ 自动化 CI/CD 部署
+- ✅ 优雅的动画效果
+- ✅ 图片懒加载
+- ✅ TypeScript 类型安全
+
+## 🚀 在线预览
+
+访问 [https://zjjyyyk.github.io/photo-site/](https://zjjyyyk.github.io/photo-site/) 查看在线演示。
+
+---
 
 **💡 提示**: 
 - 如果你需要更多功能或遇到问题，可以参考组件代码或创建 Issue 讨论
