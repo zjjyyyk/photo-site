@@ -1,0 +1,95 @@
+{
+  "categories": [
+    {
+      "id": "real",
+      "name": "真实",
+      "nameEn": "real",
+      "description": "真实图片",
+      "coverImage": "/images/1755611795240-558027703.png",
+      "photos": [
+        {
+          "id": 1755612490179,
+          "url": "/images/1755612490172-447860450.png",
+          "thumbnailUrl": "/images/1755612490172-447860450.png",
+          "title": "cover",
+          "description": "ddddemo",
+          "tags": [],
+          "exif": {
+            "dateTaken": "2025-08-19"
+          },
+          "width": 800,
+          "height": 600,
+          "uploadedAt": "2025-08-19T14:08:10.179Z",
+          "fileSize": 101308,
+          "originalName": "cover.png"
+        },
+        {
+          "id": 1755612644284,
+          "url": "/images/1755612644280-639587784.png",
+          "thumbnailUrl": "/images/1755612644280-639587784.png",
+          "title": "900px-G5000201",
+          "description": "",
+          "tags": [],
+          "exif": {
+            "dateTaken": "2025-08-19"
+          },
+          "width": 800,
+          "height": 600,
+          "uploadedAt": "2025-08-19T14:10:44.284Z",
+          "fileSize": 332916,
+          "originalName": "900px-G5000201.png"
+        }
+      ],
+      "totalCount": 2,
+      "sortWeight": 0,
+      "createdAt": "2025-08-19T13:56:35.252Z"
+    },
+    {
+      "id": "Sichuan",
+      "name": "四川",
+      "nameEn": "Sichuan",
+      "description": "四川之旅~",
+      "coverImage": "/images/1755625900154-763857760.jpg",
+      "photos": [
+        {
+          "id": 1755626055916,
+          "url": "/images/1755626055914-115220340.jpg",
+          "thumbnailUrl": "/images/1755626055914-115220340.jpg",
+          "title": "中文测试",
+          "description": "",
+          "tags": [],
+          "exif": {},
+          "width": 800,
+          "height": 600,
+          "uploadedAt": "2025-08-19T17:54:15.916Z",
+          "fileSize": 262647,
+          "originalName": "中文测试_20250820015231_4.jpg"
+        },
+        {
+          "id": 1755626679739,
+          "url": "/images/1755626679737-387789338.jpg",
+          "thumbnailUrl": "/images/1755626679737-387789338.jpg",
+          "title": "111",
+          "description": "中文测试",
+          "tags": [],
+          "exif": {
+            "dateTaken": "2025-08-19",
+            "camera": "中文测试",
+            "lens": "中文测试",
+            "shutterSpeed": "中文测试",
+            "aperture": "中文测试",
+            "iso": 100
+          },
+          "width": 800,
+          "height": 600,
+          "uploadedAt": "2025-08-19T18:04:39.739Z",
+          "fileSize": 101308,
+          "originalName": "111.jpg"
+        }
+      ],
+      "totalCount": 2,
+      "sortWeight": 0,
+      "createdAt": "2025-08-19T17:51:40.164Z"
+    }
+  ]
+}
