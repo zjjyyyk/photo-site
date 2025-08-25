@@ -407,8 +407,8 @@
           "id": 1756111771635,
           "url": "/images/麻雀_1756111771617.jpg",
           "thumbnailUrl": "/images/thumbnail/麻雀_1756111771617.jpg",
-          "title": "麻雀",
-          "description": "",
+          "title": "燕子",
+          "description": "原来不是麻雀",
           "tags": [],
           "exif": {
             "camera": "vivo vivo X100 Pro",
@@ -446,28 +446,6 @@
           "uploadedAt": "2025-08-25T08:49:31.617Z",
           "fileSize": 8967425,
           "originalName": "人民英雄.jpg"
-        },
-        {
-          "id": 1756111771638,
-          "url": "/images/摄影师特写镜头_1756111771618.jpg",
-          "thumbnailUrl": "/images/thumbnail/摄影师特写镜头_1756111771618.jpg",
-          "title": "摄影师特写镜头",
-          "description": "",
-          "tags": [],
-          "exif": {
-            "camera": "vivo vivo X100 Pro",
-            "iso": 442,
-            "aperture": "f/16",
-            "shutterSpeed": "1/33s",
-            "focalLength": "3.09mm",
-            "dateTaken": "2025-08-24",
-            "location": "39.903344, 116.388056"
-          },
-          "width": 800,
-          "height": 600,
-          "uploadedAt": "2025-08-25T08:49:31.618Z",
-          "fileSize": 8329579,
-          "originalName": "摄影师特写镜头.jpg"
         },
         {
           "id": 1756111771639,
@@ -602,7 +580,7 @@
           "originalName": "中央礼品文物管理中心.jpg"
         }
       ],
-      "totalCount": 27,
+      "totalCount": 26,
       "sortWeight": 0,
       "createdAt": "2025-08-25T07:48:19.290Z"
     }
