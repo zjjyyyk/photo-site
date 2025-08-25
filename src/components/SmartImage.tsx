@@ -5,6 +5,7 @@ interface SmartImageProps {
   alt: string;
   className?: string;
   loading?: 'lazy' | 'eager';
+  style?: React.CSSProperties;
   onLoad?: () => void;
   onError?: () => void;
 }
@@ -18,6 +19,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
   alt,
   className = '',
   loading = 'lazy',
+  style,
   onLoad,
   onError
 }) => {
@@ -35,9 +37,16 @@ const SmartImage: React.FC<SmartImageProps> = ({
     
     // 直接使用前端静态资源，因为上传时已经在本地保存了一份
     if (src.startsWith('/images/')) {
-      const frontendSrc = `/photo-site/images/${src.replace('/images/', '')}`;
-      console.log('SmartImage: 使用前端静态资源:', frontendSrc);
-      setCurrentSrc(frontendSrc);
+      // 处理缩略图路径
+      if (src.startsWith('/images/thumbnail/')) {
+        const frontendSrc = `/photo-site/images/thumbnail/${src.replace('/images/thumbnail/', '')}`;
+        console.log('SmartImage: 使用缩略图静态资源:', frontendSrc);
+        setCurrentSrc(frontendSrc);
+      } else {
+        const frontendSrc = `/photo-site/images/${src.replace('/images/', '')}`;
+        console.log('SmartImage: 使用前端静态资源:', frontendSrc);
+        setCurrentSrc(frontendSrc);
+      }
     } else {
       setCurrentSrc(src);
     }
@@ -63,6 +72,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
       src={currentSrc}
       alt={alt}
       className={className}
+      style={style}
       loading={loading}
       onLoad={handleLoad}
       onError={handleError}

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UploadPhoto } from '../types';
 import Toast from './Toast';
+import { ExifService } from '../services/exifService';
 
 interface UploadPhotosModalProps {
   isOpen: boolean;
@@ -29,26 +30,164 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (files: FileList | null) => {
+  const handleFileSelect = async (files: FileList | null) => {
     if (!files) return;
     
     const newFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
     
-    // 创建预览和初始数据
-    const newPhotos: UploadPhoto[] = newFiles.map(file => ({
-      file,
-      preview: URL.createObjectURL(file),
-      title: file.name.replace(/\.[^/.]+$/, ''), // 移除扩展名
-      description: '',
-      tags: [],
-      exif: {
-        dateTaken: new Date().toISOString().split('T')[0]
-      },
-      location: ''
-    }));
+    if (newFiles.length === 0) {
+      setToast({
+        message: '请选择有效的图片文件',
+        type: 'error',
+        visible: true
+      });
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 3000);
+      return;
+    }
+
+    // 检查文件数量限制
+    const totalFiles = photos.length + newFiles.length;
+    if (totalFiles > 500) {
+      setToast({
+        message: `文件数量超过限制！当前已选择 ${photos.length} 个文件，最多可选择 500 个文件`,
+        type: 'error',
+        visible: true
+      });
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 5000);
+      return;
+    }
+
+    // 检查文件大小限制（20MB = 20 * 1024 * 1024 bytes）
+    const maxFileSize = 20 * 1024 * 1024;
+    const oversizedFiles = newFiles.filter(file => file.size > maxFileSize);
+    if (oversizedFiles.length > 0) {
+      const oversizedNames = oversizedFiles.map(file => file.name).join(', ');
+      setToast({
+        message: `以下文件超过 20MB 限制：${oversizedNames}`,
+        type: 'error',
+        visible: true
+      });
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 5000);
+      return;
+    }
     
-    setSelectedFiles(prev => [...prev, ...newFiles]);
-    setPhotos(prev => [...prev, ...newPhotos]);
+    // 显示加载提示
+    setToast({
+      message: '正在读取图片信息...',
+      type: 'success',
+      visible: true
+    });
+    
+    try {
+      // 串行处理文件以避免中文文件名的并发问题
+      const newPhotos: UploadPhoto[] = [];
+      
+      for (let i = 0; i < newFiles.length; i++) {
+        const file = newFiles[i];
+        
+        try {
+          console.log(`处理文件 ${i + 1}/${newFiles.length}: ${file.name}`);
+          
+          // 生成标题（移除扩展名）
+          const title = file.name.replace(/\.[^/.]+$/, '');
+          
+          // 创建预览URL
+          const preview = URL.createObjectURL(file);
+          
+          // 提取 EXIF 数据
+          console.log('开始提取EXIF数据...');
+          const exifData = await ExifService.extractExifData(file);
+          console.log('EXIF数据提取完成:', exifData);
+          
+          const photoData: UploadPhoto = {
+            file,
+            preview,
+            title,
+            description: '',
+            tags: [],
+            exif: exifData || {
+              dateTaken: new Date().toISOString().split('T')[0]
+            },
+            location: exifData?.location || ''
+          };
+          
+          newPhotos.push(photoData);
+          console.log(`文件 ${file.name} 处理完成`);
+          
+        } catch (fileError) {
+          console.error(`处理文件 ${file.name} 时出错:`, fileError);
+          
+          // 即使出错也添加文件，但使用默认数据
+          const title = file.name.replace(/\.[^/.]+$/, '');
+          
+          newPhotos.push({
+            file,
+            preview: URL.createObjectURL(file),
+            title,
+            description: '',
+            tags: [],
+            exif: {
+              dateTaken: new Date().toISOString().split('T')[0]
+            },
+            location: ''
+          });
+        }
+      }
+      
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setPhotos(prev => [...prev, ...newPhotos]);
+      
+      // 显示成功提示
+      const exifCount = newPhotos.filter(photo => 
+        photo.exif && Object.keys(photo.exif).length > 1 // 检查是否有除了dateTaken之外的EXIF数据
+      ).length;
+      
+      setToast({
+        message: `成功添加 ${newFiles.length} 张图片，其中 ${exifCount} 张包含相机参数`,
+        type: 'success',
+        visible: true
+      });
+      
+      // 3秒后隐藏提示
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error processing files:', error);
+      
+      // 如果整体处理失败，使用原有的并行处理逻辑作为后备
+      const newPhotos: UploadPhoto[] = newFiles.map(file => ({
+        file,
+        preview: URL.createObjectURL(file),
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        description: '',
+        tags: [],
+        exif: {
+          dateTaken: new Date().toISOString().split('T')[0]
+        },
+        location: ''
+      }));
+      
+      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setPhotos(prev => [...prev, ...newPhotos]);
+      
+      setToast({
+        message: `添加了 ${newFiles.length} 张图片，但无法读取相机参数`,
+        type: 'error',
+        visible: true
+      });
+      
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 3000);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -61,11 +200,28 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
   };
 
   const removePhoto = (index: number) => {
-    setPhotos(prev => prev.filter((_, i) => i !== index));
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    if (currentPhotoIndex >= index && currentPhotoIndex > 0) {
+    const newPhotos = photos.filter((_, i) => i !== index);
+    const newSelectedFiles = selectedFiles.filter((_, i) => i !== index);
+    
+    setPhotos(newPhotos);
+    setSelectedFiles(newSelectedFiles);
+    
+    // 删除后的索引逻辑：优先显示下一张
+    if (newPhotos.length === 0) {
+      // 如果删除后没有照片了，重置索引
+      setCurrentPhotoIndex(0);
+    } else if (index < currentPhotoIndex) {
+      // 如果删除的是当前照片之前的，当前索引需要减1
       setCurrentPhotoIndex(currentPhotoIndex - 1);
+    } else if (index === currentPhotoIndex) {
+      // 如果删除的是当前照片
+      if (currentPhotoIndex >= newPhotos.length) {
+        // 如果当前索引超出了新数组长度，显示最后一张
+        setCurrentPhotoIndex(newPhotos.length - 1);
+      }
+      // 否则保持当前索引不变，这样就会显示下一张照片
     }
+    // 如果删除的是当前照片之后的，索引不需要变化
   };
 
   const updatePhoto = (index: number, updates: Partial<UploadPhoto>) => {
@@ -92,6 +248,33 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
     e.preventDefault();
     
     if (photos.length === 0) return;
+
+    // 最终验证检查
+    if (photos.length > 500) {
+      setToast({
+        message: '文件数量超过限制，最多上传 500 个文件',
+        type: 'error',
+        visible: true
+      });
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 5000);
+      return;
+    }
+
+    const maxFileSize = 20 * 1024 * 1024;
+    const oversizedFiles = photos.filter(photo => photo.file.size > maxFileSize);
+    if (oversizedFiles.length > 0) {
+      setToast({
+        message: `存在超过 20MB 的文件，请重新选择`,
+        type: 'error',
+        visible: true
+      });
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 5000);
+      return;
+    }
     
     setIsSubmitting(true);
     try {
@@ -115,11 +298,32 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
       }, 1500);
     } catch (error) {
       console.error('上传失败:', error);
+      
+      // 检查是否是服务器返回的详细错误信息
+      let errorMessage = '上传失败，请重试';
+      if (error instanceof Error) {
+        const message = error.message;
+        if (message.includes('文件太大') || message.includes('FILE_TOO_LARGE')) {
+          errorMessage = '文件太大，单个文件限制为 20MB';
+        } else if (message.includes('文件数量超过限制') || message.includes('TOO_MANY_FILES')) {
+          errorMessage = '文件数量超过限制，最多上传 500 个文件';
+        } else if (message.includes('文件格式不支持') || message.includes('INVALID_FILE_TYPE')) {
+          errorMessage = '上传的文件格式不支持，请选择图片文件';
+        } else if (message.length > 0) {
+          errorMessage = message;
+        }
+      }
+      
       setToast({
-        message: '上传失败，请重试',
+        message: errorMessage,
         type: 'error',
         visible: true
       });
+      
+      // 错误提示显示更长时间，但不关闭模态框
+      setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -181,8 +385,8 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
 
               {/* 主要内容区域 */}
               <div className="flex-1 flex overflow-hidden">
-                {/* 左侧：图片选择和预览 */}
-                <div className="w-1/2 border-r border-gray-200 flex flex-col">
+                {/* 左侧：图片选择和预览 - 添加滚动功能 */}
+                <div className="w-1/2 border-r border-gray-200 flex flex-col overflow-y-auto">
                   {/* 文件上传区域 */}
                   {photos.length === 0 ? (
                     <div
@@ -220,21 +424,21 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="flex-1 flex flex-col">
-                      {/* 当前图片预览 */}
-                      <div className="flex-1 p-4 flex items-center justify-center bg-gray-50">
+                    <div className="flex-1 flex flex-col relative">
+                      {/* 当前图片预览 - 移除最大高度限制，让父容器处理滚动 */}
+                      <div className="flex-1 p-4 flex items-center justify-center bg-gray-50 relative z-0">
                         {currentPhoto && (
                           <img
                             src={currentPhoto.preview}
                             alt={currentPhoto.title}
-                            className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+                            className="max-w-full h-auto object-contain rounded-lg shadow-lg"
                           />
                         )}
                       </div>
                       
-                      {/* 图片缩略图列表 */}
-                      <div className="p-4 border-t border-gray-200">
-                        <div className="flex space-x-2 overflow-x-auto">
+                      {/* 图片缩略图列表 - 固定高度，确保始终可见 */}
+                      <div className="p-4 border-t border-gray-200 bg-white relative z-50 flex-shrink-0 h-28 overflow-visible">
+                        <div className="flex space-x-2 overflow-x-auto h-full items-center">
                           {photos.map((photo, index) => (
                             <div
                               key={index}
@@ -255,7 +459,7 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
                                   e.stopPropagation();
                                   removePhoto(index);
                                 }}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-[60]"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -266,7 +470,7 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
                           
                           {/* 添加更多按钮 */}
                           <div
-                            className="flex-shrink-0 w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-warm-400 transition-colors"
+                            className="flex-shrink-0 w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-warm-400 transition-colors relative z-[60]"
                             onClick={() => fileInputRef.current?.click()}
                           >
                             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -506,6 +710,14 @@ const UploadPhotosModal: React.FC<UploadPhotosModalProps> = ({
                         </div>
                         
                         <div className="flex space-x-3">
+                          <button
+                            type="button"
+                            onClick={() => removePhoto(currentPhotoIndex)}
+                            disabled={isSubmitting || photos.length === 0}
+                            className="px-6 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                          >
+                            删除
+                          </button>
                           <button
                             type="button"
                             onClick={handleClose}

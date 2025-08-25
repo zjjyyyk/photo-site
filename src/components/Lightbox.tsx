@@ -164,7 +164,7 @@ const Lightbox: React.FC<LightboxProps> = ({
 
           {/* 图片容器 */}
           <div 
-            className="flex items-center justify-center h-full p-8"
+            className="h-full p-8 overflow-auto lightbox-scroll"
             onClick={(e) => e.stopPropagation()}
           >
             <motion.div
@@ -173,13 +173,14 @@ const Lightbox: React.FC<LightboxProps> = ({
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: -20 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="relative max-w-7xl max-h-full"
+              className="relative flex items-center justify-center min-h-full w-full"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-white/5 backdrop-blur-sm border border-white/10 inline-block max-w-full">
                 <SmartImage
                   src={currentPhoto.url}
                   alt={currentPhoto.title}
-                  className="max-w-full max-h-full object-contain rounded-2xl"
+                  className="rounded-2xl block max-w-full h-auto"
+                  style={{ maxHeight: 'none', minWidth: 'auto', minHeight: 'auto' }}
                 />
                 {/* 微妙的装饰边框 */}
                 <div className="absolute inset-0 rounded-2xl border-2 border-gradient-to-br from-warm-400/20 to-cream-400/20 pointer-events-none"></div>

@@ -12,6 +12,8 @@ import { PhotoGridSkeleton } from '../components/Loading';
 import { uploadService } from '../services/uploadService';
 import SmartImage from '../components/SmartImage';
 
+const isEditMode = false;
+
 const CategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
@@ -171,7 +173,7 @@ const CategoryPage: React.FC = () => {
           className="text-center mb-12 relative"
         >
           {/* 上传按钮 - 已隐藏 */}
-          {false  && (
+          {isEditMode  && (
             <div className="absolute top-0 right-0">
               <motion.button
                 onClick={() => setIsUploadModalOpen(true)}

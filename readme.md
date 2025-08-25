@@ -58,73 +58,11 @@ npm run server
 
 ### 2. 启用"新建分类"按钮
 
-编辑 `src/pages/HomePage.tsx` 文件，找到以下代码：
-
-```tsx
-{/* 新建分类按钮 - 已隐藏 */}
-{false && (
-  <motion.button
-    onClick={() => setIsCreateModalOpen(true)}
-    // ... 其他属性
-  >
-    新建分类
-  </motion.button>
-)}
-```
-
-将 `{false &&` 改为 `{true &&` 或者直接移除条件判断：
-
-```tsx
-{/* 新建分类按钮 - 已启用 */}
-<motion.button
-  onClick={() => setIsCreateModalOpen(true)}
-  whileHover={{ scale: 1.05, y: -2 }}
-  whileTap={{ scale: 0.95 }}
-  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-warm-600 to-warm-700 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 mb-12"
->
-  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-  </svg>
-  新建分类
-</motion.button>
-```
+编辑 `src/pages/HomePage.tsx` 文件，将`isEditMode`设置为`true`。
 
 ### 3. 启用"上传照片"按钮
 
-编辑 `src/pages/CategoryPage.tsx` 文件，找到以下代码：
-
-```tsx
-{/* 上传按钮 - 已隐藏 */}
-{false && (
-  <div className="absolute top-0 right-0">
-    <motion.button
-      onClick={() => setIsUploadModalOpen(true)}
-      // ... 其他属性
-    >
-      上传照片
-    </motion.button>
-  </div>
-)}
-```
-
-将 `{false &&` 改为 `{true &&` 或者直接移除条件判断：
-
-```tsx
-{/* 上传按钮 - 已启用 */}
-<div className="absolute top-0 right-0">
-  <motion.button
-    onClick={() => setIsUploadModalOpen(true)}
-    whileHover={{ scale: 1.05, y: -2 }}
-    whileTap={{ scale: 0.95 }}
-    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-warm-600 to-warm-700 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-  >
-    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-    </svg>
-    上传照片
-  </motion.button>
-</div>
-```
+编辑 `src/pages/CategoryPage.tsx` 文件，将`isEditMode`设置为`true`。
 
 ## 📤 如何上传照片
 
@@ -149,4 +87,46 @@ npm run server
    - 支持的格式：JPG、PNG、WEBP等
 4. 为每张照片添加标题和描述（可选）
 5. 点击"开始上传"
+
+## 🔧 维护脚本
+
+项目提供了两个实用的维护脚本来管理现有图片：
+
+### generate-thumbnails.js - 批量生成缩略图
+
+为所有现有图片生成缩略图，并更新数据文件中的缩略图路径。
+
+```bash
+# 运行缩略图生成脚本
+node generate-thumbnails.js
+```
+
+**功能说明：**
+- 自动为 `public/images/` 目录下的所有图片生成 400x300 的缩略图
+- 缩略图保存在 `public/images/thumbnail/` 目录
+- 自动更新 `userCategories.json` 中的 `thumbnailUrl` 字段
+- 跳过已存在的缩略图，避免重复处理
+- 支持 JPG、PNG、WEBP 等常见图片格式
+
+### rename-existing-images.js - 批量重命名图片
+
+将现有图片重命名为规范的 `[标题]_[时间戳]` 格式。
+
+```bash
+# 预览将要重命名的文件（不实际执行）
+node rename-existing-images.js
+
+# 执行实际的重命名操作
+node rename-existing-images.js --execute
+```
+
+**功能说明：**
+- 根据图片标题和上传时间戳重命名文件
+- 智能处理文件名冲突，自动添加序号区分
+- 安全处理特殊字符，确保文件名兼容性
+- 同时重命名原图和对应的缩略图
+- 自动更新数据文件中的URL路径
+- 执行前会创建数据备份文件
+
+**安全提示：** 建议先运行预览模式查看重命名计划，确认无误后再执行实际操作。
 

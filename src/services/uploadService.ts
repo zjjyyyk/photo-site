@@ -54,12 +54,19 @@ class UploadService {
     const metadata: Record<string, PhotoMetadata> = {};
     
     photos.forEach(photo => {
-      metadata[photo.file.name] = {
-        title: photo.title || photo.file.name.replace(/\.[^/.]+$/, ""),
+      const filename = photo.file.name;
+      metadata[filename] = {
+        title: photo.title || filename.replace(/\.[^/.]+$/, ""),
         description: photo.description || '',
         tags: photo.tags || [],
         exif: photo.exif || {},
       };
+      
+      console.log('准备上传照片元数据:', {
+        filename,
+        title: metadata[filename].title,
+        exif: metadata[filename].exif
+      });
     });
     
     const result = await apiService.uploadPhotos(categoryId, files, metadata);

@@ -7,6 +7,8 @@ import { uploadService } from '../services/uploadService';
 import SmartImage from '../components/SmartImage';
 import { PhotoCategory, CreateCategoryData } from '../types';
 
+const isEditMode = false;
+
 interface CategoryCardProps {
   category: {
     id: string;
@@ -188,7 +190,7 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* 新建分类按钮 - 已隐藏 */}
-            {false  && (
+            {isEditMode  && (
               <motion.button
                 onClick={() => setIsCreateModalOpen(true)}
                 whileHover={{ scale: 1.05, y: -2 }}
